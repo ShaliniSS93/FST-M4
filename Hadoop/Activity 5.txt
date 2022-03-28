@@ -1,0 +1,263 @@
+PS C:\Users\IBMADMIN>  docker exec -it 482db78458c4 bash
+
+root@482db78458c4:/# vim EmpData.csv
+root@482db78458c4:/# hive
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/apache-hive-3.1.2-bin/lib/log4j-slf4j-impl-2.10.0.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop-3.3.1/share/hadoop/common/lib/slf4j-log4j12-1.7.30.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Hive Session ID = dd0e49fc-2273-4a55-87b2-7315708c7208
+
+Logging initialized using configuration in jar:file:/usr/local/apache-hive-3.1.2-bin/lib/hive-common-3.1.2.jar!/hive-log4j2.properties Async: true
+Hive Session ID = dc9d3a60-bd49-468c-9684-fc78f8a71f84
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. spark, tez) or using Hive 1.X releases.
+
+
+hive> SELECT * FROM employee;
+FAILED: SemanticException [Error 10001]: Line 1:14 Table not found 'employee'
+
+hive> show databases;
+OK
+default
+Time taken: 0.217 seconds, Fetched: 1 row(s)
+
+hive> create database office;
+OK
+Time taken: 0.257 seconds
+
+hive> use office;
+OK
+Time taken: 0.036 seconds
+
+
+hive> CREATE TABLE employee
+    > (id INT, name STRING, dept STRING, yoj INT, salary INT)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    > TBLPROPERTIES ("skip.header.line.count"="1");
+OK
+Time taken: 0.553 seconds
+
+
+hive> DESCRIBE employee;
+OK
+id                      int
+name                    string
+dept                    string
+yoj                     int
+salary                  int
+Time taken: 0.245 seconds, Fetched: 5 row(s)
+
+
+hive> LOAD DATA LOCAL INPATH
+    > '/EmpData.csv'
+    > INTO TABLE employee;
+Loading data to table office.employee
+OK
+Time taken: 1.599 seconds
+
+
+hive> SELECT * FROM employee;
+OK
+1       Ian     Quality Assurance       2021    28113
+2       Beatrice        Tech Support    2021    35330
+3       Vladimir        Human Resources 2020    51445
+4       Whitney IT      2020    23818
+5       Leslie  Customer Service        2021    59882
+6       Bernard IT      2021    50330
+7       Mary    Customer Service        2021    26558
+8       Jerome  RnD     2021    45333
+9       Joshua  IT      2021    59538
+10      Keane   Human Resources 2022    46500
+11      Velma   Human Resources 2022    19816
+12      Rogan   Tech Support    2022    27554
+13      Aurelia RnD     2021    20762
+14      Merrill Quality Assurance       2021    59660
+15      Blaine  Tech Support    2022    28768
+Time taken: 1.76 seconds, Fetched: 15 row(s)
+
+
+hive> SELECT COUNT(*) FROM employee;
+Query ID = root_20220328044141_ecd93997-8560-4764-a106-133274df12ad
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1648441938555_0001, Tracking URL = http://482db78458c4:8088/proxy/application_1648441938555_0001/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1648441938555_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2022-03-28 04:41:54,484 Stage-1 map = 0%,  reduce = 0%
+2022-03-28 04:41:59,759 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.98 sec
+2022-03-28 04:42:06,051 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 6.55 sec
+MapReduce Total cumulative CPU time: 6 seconds 550 msec
+Ended Job = job_1648441938555_0001
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 6.55 sec   HDFS Read: 13143 HDFS Write: 102 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 550 msec
+OK
+15
+Time taken: 26.887 seconds, Fetched: 1 row(s)
+
+
+hive> SELECT  id, name FROM employee;
+OK
+1       Ian
+2       Beatrice
+3       Vladimir
+4       Whitney
+5       Leslie
+6       Bernard
+7       Mary
+8       Jerome
+9       Joshua
+10      Keane
+11      Velma
+12      Rogan
+13      Aurelia
+14      Merrill
+15      Blaine
+Time taken: 0.272 seconds, Fetched: 15 row(s)
+
+
+hive> SELECT * FROM employee WHERE salary > 30000;
+OK
+2       Beatrice        Tech Support    2021    35330
+3       Vladimir        Human Resources 2020    51445
+5       Leslie  Customer Service        2021    59882
+6       Bernard IT      2021    50330
+8       Jerome  RnD     2021    45333
+9       Joshua  IT      2021    59538
+10      Keane   Human Resources 2022    46500
+14      Merrill Quality Assurance       2021    59660
+Time taken: 0.228 seconds, Fetched: 8 row(s)
+
+
+hive> SELECT count(*) FROM employee;
+Query ID = root_20220328044429_0f1e5d59-4487-444c-aa85-008421200bd3
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1648441938555_0002, Tracking URL = http://482db78458c4:8088/proxy/application_1648441938555_0002/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1648441938555_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
+2022-03-28 04:44:41,076 Stage-1 map = 0%,  reduce = 0%
+2022-03-28 04:44:46,352 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 3.58 sec
+2022-03-28 04:44:52,692 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 6.78 sec
+MapReduce Total cumulative CPU time: 6 seconds 780 msec
+Ended Job = job_1648441938555_0002
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1  Reduce: 1   Cumulative CPU: 6.78 sec   HDFS Read: 13254 HDFS Write: 102 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 780 msec
+OK
+15
+Time taken: 24.572 seconds, Fetched: 1 row(s)
+
+hive> INSERT OVERWRITE [LOCAL] DIRECTORY directory;
+NoViableAltException(362@[])
+        at org.apache.hadoop.hive.ql.parse.HiveParser.destination(HiveParser.java:41819)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.insertClause(HiveParser.java:41588)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.regularBody(HiveParser.java:39556)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.queryStatementExpressionBody(HiveParser.java:38900)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.queryStatementExpression(HiveParser.java:38788)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.execStatement(HiveParser.java:2396)
+        at org.apache.hadoop.hive.ql.parse.HiveParser.statement(HiveParser.java:1420)
+        at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:220)
+        at org.apache.hadoop.hive.ql.parse.ParseUtils.parse(ParseUtils.java:74)
+        at org.apache.hadoop.hive.ql.parse.ParseUtils.parse(ParseUtils.java:67)
+        at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:616)
+        at org.apache.hadoop.hive.ql.Driver.compileInternal(Driver.java:1826)
+        at org.apache.hadoop.hive.ql.Driver.compileAndRespond(Driver.java:1773)
+        at org.apache.hadoop.hive.ql.Driver.compileAndRespond(Driver.java:1768)
+        at org.apache.hadoop.hive.ql.reexec.ReExecDriver.compileAndRespond(ReExecDriver.java:126)
+        at org.apache.hadoop.hive.ql.reexec.ReExecDriver.run(ReExecDriver.java:214)
+        at org.apache.hadoop.hive.cli.CliDriver.processLocalCmd(CliDriver.java:239)
+        at org.apache.hadoop.hive.cli.CliDriver.processCmd(CliDriver.java:188)
+        at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:402)
+        at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:821)
+        at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:759)
+        at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:683)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:498)
+        at org.apache.hadoop.util.RunJar.run(RunJar.java:323)
+        at org.apache.hadoop.util.RunJar.main(RunJar.java:236)
+FAILED: ParseException line 1:17 cannot recognize input near '[' 'LOCAL' ']' in destination specification
+
+
+hive> INSERT OVERWRITE DIRECTORY '/user/root/output/export'
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    > SELECT * FROM employee;
+Query ID = root_20220328045754_4d90c16f-ab2e-4c71-93de-7ea948e62eaa
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1648441938555_0004, Tracking URL = http://482db78458c4:8088/proxy/application_1648441938555_0004/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1648441938555_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2022-03-28 04:58:03,875 Stage-1 map = 0%,  reduce = 0%
+2022-03-28 04:58:09,151 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.61 sec
+MapReduce Total cumulative CPU time: 2 seconds 610 msec
+Ended Job = job_1648441938555_0004
+Stage-3 is selected by condition resolver.
+Stage-2 is filtered out by condition resolver.
+Stage-4 is filtered out by condition resolver.
+Moving data to directory hdfs://482db78458c4:9000/user/root/output/export/.hive-staging_hive_2022-03-28_04-57-54_613_3844220342907691917-1/-ext-10000
+Moving data to directory /user/root/output/export
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 2.61 sec   HDFS Read: 5662 HDFS Write: 480 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 610 msec
+OK
+Time taken: 16.796 seconds
+
+
+hive> dfs -ls /user/root/output/export
+    > ;
+Found 1 items
+-rw-r--r--   1 root supergroup        480 2022-03-28 04:58 /user/root/output/export/000000_0
+
+
+hive> INSERT OVERWRITE LOCAL DIRECTORY '/export'
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    > SELECT * FROM emp.employee;
+FAILED: SemanticException [Error 10001]: Line 3:14 Table not found 'employee'
+
+
+hive> INSERT OVERWRITE LOCAL DIRECTORY '/export'
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    > SELECT * FROM employee;
+Query ID = root_20220328044852_f7199f8e-2dd7-4f73-aa89-718e27f9c16c
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1648441938555_0003, Tracking URL = http://482db78458c4:8088/proxy/application_1648441938555_0003/
+Kill Command = /usr/local/hadoop/bin/mapred job  -kill job_1648441938555_0003
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2022-03-28 04:49:01,882 Stage-1 map = 0%,  reduce = 0%
+2022-03-28 04:49:07,085 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 2.28 sec
+MapReduce Total cumulative CPU time: 2 seconds 280 msec
+Ended Job = job_1648441938555_0003
+Moving data to local directory /export
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 2.28 sec   HDFS Read: 5652 HDFS Write: 480 SUCCESS
+Total MapReduce CPU Time Spent: 2 seconds 280 msec
+OK
+Time taken: 16.334 seconds
+
+
+hive> exit;
+
+root@482db78458c4:/# cat /path/to/result/* > output.csv
+cat: '/path/to/result/*': No such file or directory
+
